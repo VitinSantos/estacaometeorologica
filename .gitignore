@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vercel/
+firmware/estacao_esp32/config.h
+.pytest_cache/
+.DS_Store

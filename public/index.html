@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClimaSP Aberta | Estação meteorológica pública</title>
+  <meta name="description" content="Dados ambientais de São Paulo em tempo real: temperatura, umidade, pressão, qualidade do ar, luminosidade e chuva.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%232a78d6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__titulo">
+      <h1>ClimaSP Aberta</h1>
+      <p id="estacao-nome">Carregando estação…</p>
+    </div>
+    <div class="topo__status" aria-live="polite">
+      <p><span id="status-ponto" class="ponto"></span><span id="status-texto">Verificando…</span></p>
+      <p id="atualizado" class="discreto"></p>
+    </div>
+  </header>
+
+  <main class="pagina">
+    <div id="aviso" class="aviso" role="alert" hidden></div>
+
+    <section aria-labelledby="titulo-agora">
+      <h2 id="titulo-agora" class="sr-only">Condições atuais</h2>
+      <div class="cards">
+        <article class="card-medida">
+          <h3>Temperatura</h3>
+          <p class="valor" id="v-temperatura">--</p>
+          <p class="fonte">DHT22 e BMP280 (média)</p>
+        </article>
+        <article class="card-medida">
+          <h3>Umidade</h3>
+          <p class="valor" id="v-umidade">--</p>
+          <p class="fonte">DHT22</p>
+        </article>
+        <article class="card-medida">
+          <h3>Pressão</h3>
+          <p class="valor" id="v-pressao">--</p>
+          <p class="fonte">BMP280</p>
+        </article>
+        <article class="card-medida">
+          <h3>Qualidade do ar</h3>
+          <p class="valor" id="v-ar">--</p>
+          <p class="fonte" id="v-ar-detalhe">MQ-135 (índice relativo)</p>
+        </article>
+        <article class="card-medida">
+          <h3>Luminosidade</h3>
+          <p class="valor" id="v-luz">--</p>
+          <p class="fonte">LDR</p>
+        </article>
+        <article class="card-medida">
+          <h3>Chuva (24 h)</h3>
+          <p class="valor" id="v-chuva">--</p>
+          <p class="fonte">Funil e HC-SR04</p>
+        </article>
+      </div>
+      <p id="suspeita" class="aviso aviso--leve" hidden>Esta leitura foi marcada como suspeita pelo sistema de validação e pode conter erro de sensor.</p>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-historico">
+      <div class="painel__cabeca">
+        <h2 id="titulo-historico">Histórico de 24 horas</h2>
+        <div class="abas" role="group" aria-label="Variável do gráfico">
+          <button type="button" class="aba ativa" data-serie="temperatura_c" aria-pressed="true">Temperatura</button>
+          <button type="button" class="aba" data-serie="umidade" aria-pressed="false">Umidade</button>
+          <button type="button" class="aba" data-serie="pressao_hpa" aria-pressed="false">Pressão</button>
+          <button type="button" class="aba" data-serie="chuva_mm" aria-pressed="false">Chuva</button>
+        </div>
+      </div>
+      <div class="grafico">
+        <canvas id="grafico" role="img" aria-label="Gráfico de linha com o histórico de 24 horas da variável selecionada">Histórico de 24 horas.</canvas>
+        <p id="grafico-vazio" class="vazio" hidden>Ainda não há leituras nas últimas 24 horas.</p>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-mapa">
+      <div class="painel__cabeca">
+        <h2 id="titulo-mapa">Mapa das estações</h2>
+        <button type="button" id="btn-proxima" class="botao">Estação mais próxima de mim</button>
+      </div>
+      <div id="mapa" class="mapa" role="region" aria-label="Mapa com a localização das estações"></div>
+      <p id="mapa-resultado" class="discreto" aria-live="polite">Permita o acesso à localização para calcular a distância até cada estação.</p>
+    </section>
+
+    <section class="educativo" aria-labelledby="titulo-edu">
+      <h2 id="titulo-edu" class="sr-only">Sobre o projeto</h2>
+      <article class="card-info">
+        <h3>Cidades inteligentes</h3>
+        <p>Sensores conectados à internet geram dados abertos que ajudam a gestão urbana a reagir mais rápido a chuvas, calor e poluição.</p>
+      </article>
+      <article class="card-info">
+        <h3>Consciência ambiental</h3>
+        <p>Acompanhar o ar e o clima do seu bairro ajuda a tomar decisões, como evitar exercício ao ar livre quando a qualidade do ar piora.</p>
+      </article>
+      <article class="card-info">
+        <h3>Transparência</h3>
+        <p>O painel é público e não exige login. Os dados são enviados por um ESP32 e atualizados automaticamente.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>Projeto acadêmico de Projeto e Desenvolvimento II. Os dados são experimentais e não substituem fontes oficiais como INMET e CETESB.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
